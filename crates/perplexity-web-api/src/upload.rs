@@ -5,9 +5,8 @@ use regex::Regex;
 use rquest::Client as HttpClient;
 
 pub(crate) async fn upload_file(http: &HttpClient, file: &UploadFile) -> Result<String> {
-    let content_type = mime_guess::from_path(file.filename())
-        .first_or_octet_stream()
-        .to_string();
+    let content_type =
+        mime_guess::from_path(file.filename()).first_or_octet_stream().to_string();
 
     let upload_url_resp: UploadUrlResponse = http
         .post(format!("{}{}", API_BASE_URL, ENDPOINT_UPLOAD_URL))

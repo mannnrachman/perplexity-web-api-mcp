@@ -65,31 +65,30 @@ pub struct PerplexityServer {
 impl PerplexityServer {
     /// Creates a new server instance with the given Perplexity client.
     pub fn new(client: Client) -> Self {
-        Self {
-            client: Arc::new(client),
-            tool_router: Self::tool_router(),
-        }
+        Self { client: Arc::new(client), tool_router: Self::tool_router() }
     }
 
     /// Helper to execute a search with the given mode.
-    async fn do_search(&self, params: PerplexityRequest, mode: &str) -> Result<PerplexityResponse, McpError> {
+    async fn do_search(
+        &self,
+        params: PerplexityRequest,
+        mode: &str,
+    ) -> Result<PerplexityResponse, McpError> {
         let mut request = SearchRequest::new(&params.query).mode(mode);
 
-        if let Some(sources) = params.sources {
-            if !sources.is_empty() {
-                request = request.sources(sources);
-            }
+        if let Some(sources) = params.sources
+            && !sources.is_empty()
+        {
+            request = request.sources(sources);
         }
 
         if let Some(language) = params.language {
             request = request.language(language);
         }
 
-        let response = self
-            .client
-            .search(request)
-            .await
-            .map_err(|e| McpError::internal_error(format!("Perplexity API error: {}", e), None))?;
+        let response = self.client.search(request).await.map_err(|e| {
+            McpError::internal_error(format!("Perplexity API error: {}", e), None)
+        })?;
 
         Ok(PerplexityResponse {
             answer: response.answer,
@@ -117,8 +116,9 @@ impl PerplexityServer {
         Parameters(params): Parameters<PerplexityRequest>,
     ) -> Result<CallToolResult, McpError> {
         let response = self.do_search(params, "auto").await?;
-        let json = serde_json::to_string_pretty(&response)
-            .map_err(|e| McpError::internal_error(format!("JSON serialization error: {}", e), None))?;
+        let json = serde_json::to_string_pretty(&response).map_err(|e| {
+            McpError::internal_error(format!("JSON serialization error: {}", e), None)
+        })?;
         Ok(CallToolResult::success(vec![Content::text(json)]))
     }
 
@@ -135,8 +135,9 @@ impl PerplexityServer {
         Parameters(params): Parameters<PerplexityRequest>,
     ) -> Result<CallToolResult, McpError> {
         let response = self.do_search(params, "deep research").await?;
-        let json = serde_json::to_string_pretty(&response)
-            .map_err(|e| McpError::internal_error(format!("JSON serialization error: {}", e), None))?;
+        let json = serde_json::to_string_pretty(&response).map_err(|e| {
+            McpError::internal_error(format!("JSON serialization error: {}", e), None)
+        })?;
         Ok(CallToolResult::success(vec![Content::text(json)]))
     }
 
@@ -153,8 +154,9 @@ impl PerplexityServer {
         Parameters(params): Parameters<PerplexityRequest>,
     ) -> Result<CallToolResult, McpError> {
         let response = self.do_search(params, "reasoning").await?;
-        let json = serde_json::to_string_pretty(&response)
-            .map_err(|e| McpError::internal_error(format!("JSON serialization error: {}", e), None))?;
+        let json = serde_json::to_string_pretty(&response).map_err(|e| {
+            McpError::internal_error(format!("JSON serialization error: {}", e), None)
+        })?;
         Ok(CallToolResult::success(vec![Content::text(json)]))
     }
 }
@@ -184,7 +186,9 @@ fn require_env(name: &str) -> String {
         eprintln!("  SESSION_TOKEN=<token> CSRF_TOKEN=<token> perlexity-web-mcp");
         eprintln!();
         eprintln!("Required environment variables:");
-        eprintln!("  SESSION_TOKEN  - Perplexity session token (next-auth.session-token cookie)");
+        eprintln!(
+            "  SESSION_TOKEN  - Perplexity session token (next-auth.session-token cookie)"
+        );
         eprintln!("  CSRF_TOKEN     - Perplexity CSRF token (next-auth.csrf-token cookie)");
         std::process::exit(1);
     })
@@ -194,7 +198,9 @@ fn require_env(name: &str) -> String {
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Initialize tracing (logs to stderr to not interfere with stdio transport)
     fmt()
-        .with_env_filter(EnvFilter::from_default_env().add_directive(tracing::Level::INFO.into()))
+        .with_env_filter(
+            EnvFilter::from_default_env().add_directive(tracing::Level::INFO.into()),
+        )
         .with_writer(std::io::stderr)
         .with_ansi(false)
         .init();
@@ -211,26 +217,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     cookies.insert("next-auth.csrf-token".to_string(), csrf_token);
 
     // Build the Perplexity client with authentication
-    let client = Client::builder()
-        .cookies(cookies)
-        .build()
-        .await
-        .map_err(|e| {
-            eprintln!("Failed to create Perplexity client: {}", e);
-            e
-        })?;
+    let client = Client::builder().cookies(cookies).build().await.map_err(|e| {
+        eprintln!("Failed to create Perplexity client: {}", e);
+        e
+    })?;
 
     tracing::info!("Perplexity client initialized");
 
     // Create and start the MCP server
     let server = PerplexityServer::new(client);
 
-    let service = server
-        .serve(stdio())
-        .await
-        .inspect_err(|e| {
-            tracing::error!("Server error: {:?}", e);
-        })?;
+    let service = server.serve(stdio()).await.inspect_err(|e| {
+        tracing::error!("Server error: {:?}", e);
+    })?;
 
     tracing::info!("MCP server running on stdio");
 

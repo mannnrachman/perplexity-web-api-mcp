@@ -3,12 +3,13 @@ members = ["crates/*"]
 resolver = "2"
 
 [workspace.package]
-edition = "2021"
-rust-version = "1.87"
-homepage = "https://github.com/mishamyrt/perplexity-web-mcp"
-documentation = "https://github.com/mishamyrt/perplexity-web-mcp"
-repository = "https://github.com/mishamyrt/perplexity-web-mcp"
+edition = "2024"
+rust-version = "1.90"
+homepage = "https://github.com/mishamyrt/perplexity-web-api-mcp"
+documentation = "https://github.com/mishamyrt/perplexity-web-api-mcp"
+repository = "https://github.com/mishamyrt/perplexity-web-api-mcp"
 authors = ["Mikhael Khrustik <misha@myrt.co>"]
+keywords = ["perplexity", "mcp", "ai", "search"]
 license = "MIT"
 
 [workspace.dependencies]
@@ -32,8 +33,62 @@ regex = "1"
 thiserror = "2"
 async-stream = "0.3"
 pin-project-lite = "0.2"
+rmcp = { version = "0.12", features = [
+    "server",
+    "macros",
+    "transport-io",
+    "schemars",
+] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[workspace.lints.rust]
+unreachable_pub = "warn"
+unexpected_cfgs = { level = "warn", check-cfg = [
+    "cfg(codspeed)",
+] }
+
+[workspace.lints.clippy]
+pedantic = { level = "warn", priority = -2 }
+# Allowed pedantic lints
+char_lit_as_u8 = "allow"
+collapsible_else_if = "allow"
+collapsible_if = "allow"
+implicit_hasher = "allow"
+map_unwrap_or = "allow"
+match_same_arms = "allow"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+module_name_repetitions = "allow"
+must_use_candidate = "allow"
+similar_names = "allow"
+single_match_else = "allow"
+too_many_lines = "allow"
+needless_raw_string_hashes = "allow"
+# Disallowed restriction lints
+print_stdout = "warn"
+print_stderr = "warn"
+dbg_macro = "warn"
+empty_drop = "warn"
+empty_structs_with_brackets = "warn"
+exit = "warn"
+get_unwrap = "warn"
+rc_buffer = "warn"
+rc_mutex = "warn"
+rest_pat_in_fully_bound_structs = "warn"
+redundant_clone = "warn"
+debug_assert_with_mut_call = "warn"
+unused_peekable = "warn"
+large_stack_arrays = "allow"
+
+[profile.release]
+lto = "thin"
+codegen-units = 5
 
 # The profile that 'dist' will build with
 [profile.dist]
 inherits = "release"
-lto = "thin"
+lto = "fat"
+codegen-units = 1
+strip = true
+opt-level = "z"

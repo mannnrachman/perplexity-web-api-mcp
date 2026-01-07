@@ -1,13 +1,13 @@
 use crate::config::{
-    model_preference, API_BASE_URL, API_VERSION, ENDPOINT_AUTH_SESSION,
-    ENDPOINT_SSE_ASK, VALID_MODES, VALID_SOURCES,
+    API_BASE_URL, API_VERSION, ENDPOINT_AUTH_SESSION, ENDPOINT_SSE_ASK, VALID_MODES,
+    VALID_SOURCES, model_preference,
 };
 use crate::error::{Error, Result};
 use crate::sse::SseStream;
 use crate::types::{AskParams, AskPayload, SearchEvent, SearchRequest, SearchResponse};
 use crate::upload::upload_file;
 use futures_util::{Stream, StreamExt};
-use rquest::{cookie::Jar, Client as HttpClient};
+use rquest::{Client as HttpClient, cookie::Jar};
 use rquest_util::Emulation;
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -22,10 +22,7 @@ pub struct ClientBuilder {
 impl ClientBuilder {
     /// Creates a new builder with default settings.
     pub fn new() -> Self {
-        Self {
-            cookies: HashMap::new(),
-            http_client: None,
-        }
+        Self { cookies: HashMap::new(), http_client: None }
     }
 
     /// Sets authentication cookies for the client.
@@ -53,12 +50,13 @@ impl ClientBuilder {
             Some(client) => client,
             None => {
                 let jar = Arc::new(Jar::default());
-                let url = API_BASE_URL.parse().map_err(|_| {
-                    Error::Validation("Invalid API base URL".to_string())
-                })?;
+                let url = API_BASE_URL
+                    .parse()
+                    .map_err(|_| Error::Validation("Invalid API base URL".to_string()))?;
 
                 for (name, value) in &self.cookies {
-                    let cookie = format!("{}={}; Domain=www.perplexity.ai; Path=/", name, value);
+                    let cookie =
+                        format!("{}={}; Domain=www.perplexity.ai; Path=/", name, value);
                     jar.add_cookie_str(&cookie, &url);
                 }
 
@@ -70,14 +68,9 @@ impl ClientBuilder {
             }
         };
 
-        http.get(format!("{}{}", API_BASE_URL, ENDPOINT_AUTH_SESSION))
-            .send()
-            .await?;
+        http.get(format!("{}{}", API_BASE_URL, ENDPOINT_AUTH_SESSION)).send().await?;
 
-        Ok(Client {
-            http,
-            has_cookies: !self.cookies.is_empty(),
-        })
+        Ok(Client { http, has_cookies: !self.cookies.is_empty() })
     }
 }
 
@@ -164,11 +157,7 @@ impl Client {
             attachments.extend(follow_up.attachments.clone());
         }
 
-        let mode_str = if request.mode == "auto" {
-            "concise"
-        } else {
-            "copilot"
-        };
+        let mode_str = if request.mode == "auto" { "concise" } else { "copilot" };
 
         let model_pref = model_preference(&request.mode, request.model.as_deref())
             .ok_or_else(|| {
@@ -203,11 +192,9 @@ impl Client {
             .send()
             .await?
             .error_for_status()
-            .map_err(|e| {
-                Error::Server {
-                    status: e.status().map(|s| s.as_u16()).unwrap_or(0),
-                    message: e.to_string(),
-                }
+            .map_err(|e| Error::Server {
+                status: e.status().map(|s| s.as_u16()).unwrap_or(0),
+                message: e.to_string(),
             })?;
 
         Ok(SseStream::new(response.bytes_stream()))

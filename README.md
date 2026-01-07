@@ -1,4 +1,10 @@
-# Perplexity Web API MCP Server
+<h1>Perplexity Web API MCP Server
+    <a href="https://npmjs.com/package/perplexity-web-api-mcp">
+        <img
+            src="https://img.shields.io/npm/v/perplexity-web-api-mcp.svg?color=red"
+            alt="NPM Version" />
+    </a>
+</h1>
 
 MCP (Model Context Protocol) server that exposes Perplexity AI search, research, and reasoning capabilities as tools.
 
@@ -72,6 +78,7 @@ Quick web search using Perplexity's turbo model.
 **Best for:** Quick questions, everyday searches, and conversational queries that benefit from web context.
 
 **Parameters:**
+
 - `query` (required): The search query or question
 - `sources` (optional): Array of sources - `"web"`, `"scholar"`, `"social"`. Defaults to `["web"]`
 - `language` (optional): Language code, e.g., `"en-US"`. Defaults to `"en-US"`

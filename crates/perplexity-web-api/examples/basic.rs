@@ -12,9 +12,8 @@ async fn main() -> perplexity_web_api::Result<()> {
 
     println!("Making query...");
 
-    let response = client
-        .search(SearchRequest::new("What is the Rust programming language?"))
-        .await?;
+    let response =
+        client.search(SearchRequest::new("What is the Rust programming language?")).await?;
 
     println!("\n--- Response ---");
     if let Some(answer) = response.answer {

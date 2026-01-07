@@ -13,10 +13,7 @@ async fn main() -> perplexity_web_api::Result<()> {
     // See README for instructions on obtaining cookies.
     let mut cookies = HashMap::new();
     cookies.insert("next-auth.csrf-token".to_string(), "your-token".to_string());
-    cookies.insert(
-        "next-auth.session-token".to_string(),
-        "your-session".to_string(),
-    );
+    cookies.insert("next-auth.session-token".to_string(), "your-session".to_string());
 
     if cookies.is_empty() {
         println!("No cookies provided. Showing example code only.\n");

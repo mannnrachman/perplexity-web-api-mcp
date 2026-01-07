@@ -13,18 +13,12 @@ pub enum UploadFile {
 impl UploadFile {
     /// Creates an `UploadFile` from bytes.
     pub fn from_bytes(filename: impl Into<String>, data: impl Into<Vec<u8>>) -> Self {
-        Self::Bytes {
-            filename: filename.into(),
-            data: data.into(),
-        }
+        Self::Bytes { filename: filename.into(), data: data.into() }
     }
 
     /// Creates an `UploadFile` from text content.
     pub fn from_text(filename: impl Into<String>, content: impl Into<String>) -> Self {
-        Self::Text {
-            filename: filename.into(),
-            content: content.into(),
-        }
+        Self::Text { filename: filename.into(), content: content.into() }
     }
 
     pub(crate) fn filename(&self) -> &str {
@@ -139,10 +133,7 @@ pub struct FollowUpContext {
 impl FollowUpContext {
     /// Creates a new empty follow-up context.
     pub fn new() -> Self {
-        Self {
-            backend_uuid: None,
-            attachments: Vec::new(),
-        }
+        Self { backend_uuid: None, attachments: Vec::new() }
     }
 }
 

@@ -1,13 +1,12 @@
 [package]
 name = "perplexity-web-api"
-publish = false
-version = "0.0.0"
-edition = "2021"
 description = "Async Rust client library for Perplexity AI Web API"
-license = "MIT"
-repository = "https://github.com/mishamyrt/perplexity-web-api-rs"
-keywords = ["perplexity", "ai", "api", "async"]
-categories = ["api-bindings", "asynchronous"]
+version = "0.0.0"
+publish = false
+edition = { workspace = true }
+license = { workspace = true }
+repository = { workspace = true }
+keywords = { workspace = true }
 
 [dependencies]
 tokio = { workspace = true }
@@ -23,4 +22,3 @@ async-stream = { workspace = true }
 pin-project-lite = { workspace = true }
 rquest = { workspace = true }
 rquest-util = { workspace = true }
-

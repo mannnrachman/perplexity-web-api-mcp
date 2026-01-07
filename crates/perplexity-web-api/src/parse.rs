@@ -45,34 +45,22 @@ pub(crate) fn parse_sse_event(json_str: &str) -> Result<SearchEvent> {
         }
     }
 
-    let backend_uuid = content_json
-        .get("backend_uuid")
-        .and_then(|v| v.as_str())
-        .map(|s| s.to_string());
+    let backend_uuid =
+        content_json.get("backend_uuid").and_then(|v| v.as_str()).map(|s| s.to_string());
 
     let attachments = content_json
         .get("attachments")
         .and_then(|v| v.as_array())
-        .map(|arr| {
-            arr.iter()
-                .filter_map(|v| v.as_str().map(|s| s.to_string()))
-                .collect()
-        })
+        .map(|arr| arr.iter().filter_map(|v| v.as_str().map(|s| s.to_string())).collect())
         .unwrap_or_default();
 
     if answer.is_none() {
-        answer = content_json
-            .get("answer")
-            .and_then(|v| v.as_str())
-            .map(|s| s.to_string());
+        answer = content_json.get("answer").and_then(|v| v.as_str()).map(|s| s.to_string());
     }
 
     if chunks.is_empty() {
-        chunks = content_json
-            .get("chunks")
-            .and_then(|v| v.as_array())
-            .cloned()
-            .unwrap_or_default();
+        chunks =
+            content_json.get("chunks").and_then(|v| v.as_array()).cloned().unwrap_or_default();
     }
 
     let mut raw = HashMap::new();
@@ -82,11 +70,5 @@ pub(crate) fn parse_sse_event(json_str: &str) -> Result<SearchEvent> {
         }
     }
 
-    Ok(SearchEvent {
-        answer,
-        chunks,
-        backend_uuid,
-        attachments,
-        raw,
-    })
+    Ok(SearchEvent { answer, chunks, backend_uuid, attachments, raw })
 }

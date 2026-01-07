@@ -24,11 +24,7 @@ where
     S: Stream<Item = std::result::Result<Bytes, rquest::Error>>,
 {
     pub fn new(inner: S) -> Self {
-        Self {
-            inner,
-            buffer: String::new(),
-            finished: false,
-        }
+        Self { inner, buffer: String::new(), finished: false }
     }
 }
 

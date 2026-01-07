@@ -1,12 +1,12 @@
 [package]
 name = "perplexity-web-api-mcp"
-version = "0.1.0"
-edition = "2021"
+version = "0.1.1"
 description = "MCP server exposing Perplexity AI search, research, and reasoning tools"
-license = "MIT"
-repository = "https://github.com/mishamyrt/perplexity-web-api-rs"
-keywords = ["perplexity", "mcp", "ai", "search"]
-categories = ["api-bindings", "asynchronous"]
+edition = { workspace = true }
+rust-version = { workspace = true }
+license = { workspace = true }
+repository = { workspace = true }
+keywords = { workspace = true }
 
 [[bin]]
 name = "perplexity-web-api-mcp"
@@ -15,9 +15,9 @@ path = "src/main.rs"
 [dependencies]
 perplexity-web-api = { workspace = true }
 
-tokio = { version = "1", features = ["rt-multi-thread", "macros", "io-std"] }
-rmcp = { version = "0.12", features = ["server", "macros", "transport-io", "schemars"] }
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
-tracing = "0.1"
-tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tokio = { workspace = true }
+rmcp = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
