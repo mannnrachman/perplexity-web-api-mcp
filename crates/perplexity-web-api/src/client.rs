@@ -1,9 +1,9 @@
 use crate::config::{
-    API_BASE_URL, API_VERSION, ENDPOINT_AUTH_SESSION, ENDPOINT_SSE_ASK, VALID_MODES,
-    VALID_SOURCES, model_preference,
+    API_BASE_URL, API_VERSION, ENDPOINT_AUTH_SESSION, ENDPOINT_SSE_ASK, model_preference,
 };
 use crate::error::{Error, Result};
 use crate::sse::SseStream;
+use crate::types::SearchMode;
 use crate::types::{AskParams, AskPayload, SearchEvent, SearchRequest, SearchResponse};
 use crate::upload::upload_file;
 use futures_util::{Stream, StreamExt};
@@ -157,16 +157,21 @@ impl Client {
             attachments.extend(follow_up.attachments.clone());
         }
 
-        let mode_str = if request.mode == "auto" { "concise" } else { "copilot" };
+        let mode_str = match request.mode {
+            SearchMode::Auto => "concise",
+            _ => "copilot",
+        };
 
-        let model_pref = model_preference(&request.mode, request.model.as_deref())
-            .ok_or_else(|| {
-                Error::Validation(format!(
-                    "Invalid model '{}' for mode '{}'",
-                    request.model.as_deref().unwrap_or("default"),
-                    request.mode
-                ))
-            })?;
+        let model_pref = model_preference(request.mode, request.model).ok_or_else(|| {
+            Error::Validation(format!(
+                "Invalid model '{}' for mode '{}'",
+                request.model.map(|m| m.as_str()).unwrap_or("default"),
+                request.mode
+            ))
+        })?;
+
+        let sources_str: Vec<String> =
+            request.sources.iter().map(|s| s.as_str().to_string()).collect();
 
         let payload = AskPayload {
             query_str: request.query,
@@ -180,7 +185,7 @@ impl Client {
                 mode: mode_str.to_string(),
                 model_preference: model_pref.to_string(),
                 source: "default".to_string(),
-                sources: request.sources,
+                sources: sources_str,
                 version: API_VERSION.to_string(),
             },
         };
@@ -201,22 +206,8 @@ impl Client {
     }
 
     fn validate_request(&self, request: &SearchRequest) -> Result<()> {
-        if !VALID_MODES.contains(&request.mode.as_str()) {
-            return Err(Error::Validation(format!(
-                "Invalid mode '{}'. Valid modes: {:?}",
-                request.mode, VALID_MODES
-            )));
-        }
-
-        for source in &request.sources {
-            if !VALID_SOURCES.contains(&source.as_str()) {
-                return Err(Error::Validation(format!(
-                    "Invalid source '{}'. Valid sources: {:?}",
-                    source, VALID_SOURCES
-                )));
-            }
-        }
-
+        // Mode and sources are now validated at compile time via enums.
+        // Only runtime validation needed is for file uploads requiring auth.
         if !request.files.is_empty() && !self.has_cookies {
             return Err(Error::Validation(
                 "File uploads require authentication cookies".to_string(),

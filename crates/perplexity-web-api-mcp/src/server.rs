@@ -1,4 +1,4 @@
-use perplexity_web_api::{Client, SearchRequest};
+use perplexity_web_api::{Client, SearchMode, SearchRequest, Source};
 use rmcp::{
     ErrorData as McpError, ServerHandler,
     handler::server::{router::tool::ToolRouter, wrapper::Parameters},
@@ -22,6 +22,16 @@ pub struct PerplexityRequest {
     /// Language code (ISO 639), e.g., "en-US". Defaults to "en-US".
     #[serde(default)]
     pub language: Option<String>,
+}
+
+/// Parses a source string into a Source enum.
+fn parse_source(s: &str) -> Option<Source> {
+    match s {
+        "web" => Some(Source::Web),
+        "scholar" => Some(Source::Scholar),
+        "social" => Some(Source::Social),
+        _ => None,
+    }
 }
 
 /// Response from Perplexity tools.
@@ -64,14 +74,18 @@ impl PerplexityServer {
     async fn do_search(
         &self,
         params: PerplexityRequest,
-        mode: &str,
+        mode: SearchMode,
     ) -> Result<PerplexityResponse, McpError> {
         let mut request = SearchRequest::new(&params.query).mode(mode).incognito(true);
 
         if let Some(sources) = params.sources
             && !sources.is_empty()
         {
-            request = request.sources(sources);
+            let parsed_sources: Vec<Source> =
+                sources.iter().filter_map(|s| parse_source(s.as_str())).collect();
+            if !parsed_sources.is_empty() {
+                request = request.sources(parsed_sources);
+            }
         }
 
         if let Some(language) = params.language {
@@ -107,7 +121,7 @@ impl PerplexityServer {
         &self,
         Parameters(params): Parameters<PerplexityRequest>,
     ) -> Result<CallToolResult, McpError> {
-        let response = self.do_search(params, "auto").await?;
+        let response = self.do_search(params, SearchMode::Auto).await?;
         let json = serde_json::to_string_pretty(&response).map_err(|e| {
             McpError::internal_error(format!("JSON serialization error: {}", e), None)
         })?;
@@ -126,7 +140,7 @@ impl PerplexityServer {
         &self,
         Parameters(params): Parameters<PerplexityRequest>,
     ) -> Result<CallToolResult, McpError> {
-        let response = self.do_search(params, "deep research").await?;
+        let response = self.do_search(params, SearchMode::DeepResearch).await?;
         let json = serde_json::to_string_pretty(&response).map_err(|e| {
             McpError::internal_error(format!("JSON serialization error: {}", e), None)
         })?;
@@ -145,7 +159,7 @@ impl PerplexityServer {
         &self,
         Parameters(params): Parameters<PerplexityRequest>,
     ) -> Result<CallToolResult, McpError> {
-        let response = self.do_search(params, "reasoning").await?;
+        let response = self.do_search(params, SearchMode::Reasoning).await?;
         let json = serde_json::to_string_pretty(&response).map_err(|e| {
             McpError::internal_error(format!("JSON serialization error: {}", e), None)
         })?;

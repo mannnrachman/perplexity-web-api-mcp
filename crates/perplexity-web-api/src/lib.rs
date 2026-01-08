@@ -72,16 +72,16 @@
 //!
 //! # Search Modes
 //!
-//! - `"auto"` - Default mode, uses the turbo model
-//! - `"pro"` - Enhanced mode with access to premium models
-//! - `"reasoning"` - Chain-of-thought reasoning models
-//! - `"deep research"` - Extended research capabilities
+//! - [`SearchMode::Auto`] - Default mode, uses the turbo model
+//! - [`SearchMode::Pro`] - Enhanced mode with access to premium models
+//! - [`SearchMode::Reasoning`] - Chain-of-thought reasoning models
+//! - [`SearchMode::DeepResearch`] - Extended research capabilities
 //!
 //! # Sources
 //!
-//! - `"web"` - General web search (default)
-//! - `"scholar"` - Academic papers and research
-//! - `"social"` - Social media content
+//! - [`Source::Web`] - General web search (default)
+//! - [`Source::Scholar`] - Academic papers and research
+//! - [`Source::Social`] - Social media content
 
 mod client;
 mod config;
@@ -93,4 +93,7 @@ mod upload;
 
 pub use client::{Client, ClientBuilder};
 pub use error::{Error, Result};
-pub use types::{FollowUpContext, SearchEvent, SearchRequest, SearchResponse, UploadFile};
+pub use types::{
+    FollowUpContext, Model, SearchEvent, SearchMode, SearchRequest, SearchResponse, Source,
+    UploadFile,
+};

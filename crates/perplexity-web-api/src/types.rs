@@ -1,5 +1,116 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::fmt;
+
+/// Search mode for Perplexity queries.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum SearchMode {
+    /// Default mode using the turbo model.
+    #[default]
+    Auto,
+    /// Enhanced mode with access to premium models.
+    Pro,
+    /// Chain-of-thought reasoning models.
+    Reasoning,
+    /// Extended research capabilities.
+    DeepResearch,
+}
+
+impl SearchMode {
+    /// Returns the string representation used by the API.
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::Auto => "auto",
+            Self::Pro => "pro",
+            Self::Reasoning => "reasoning",
+            Self::DeepResearch => "deep research",
+        }
+    }
+}
+
+impl fmt::Display for SearchMode {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+/// Information source for search queries.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum Source {
+    /// General web search (default).
+    #[default]
+    Web,
+    /// Academic papers and research.
+    Scholar,
+    /// Social media content.
+    Social,
+}
+
+impl Source {
+    /// Returns the string representation used by the API.
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::Web => "web",
+            Self::Scholar => "scholar",
+            Self::Social => "social",
+        }
+    }
+}
+
+impl fmt::Display for Source {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+/// Model selection for Pro and Reasoning modes.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Model {
+    // Pro mode models
+    /// Sonar model (Pro mode).
+    Sonar,
+    /// GPT-5.2 model (Pro mode).
+    Gpt52,
+    /// Claude 4.5 Sonnet model (Pro mode).
+    Claude45Sonnet,
+    /// Grok 4.1 model (Pro mode).
+    Grok41,
+
+    // Reasoning mode models
+    /// GPT-5.2 with thinking capabilities (Reasoning mode).
+    Gpt52Thinking,
+    /// Claude 4.5 Sonnet with thinking capabilities (Reasoning mode).
+    Claude45SonnetThinking,
+    /// Gemini 3.0 Pro model (Reasoning mode).
+    Gemini30Pro,
+    /// Kimi K2 with thinking capabilities (Reasoning mode).
+    KimiK2Thinking,
+    /// Grok 4.1 with reasoning capabilities (Reasoning mode).
+    Grok41Reasoning,
+}
+
+impl Model {
+    /// Returns the user-facing string representation.
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::Sonar => "sonar",
+            Self::Gpt52 => "gpt-5.2",
+            Self::Claude45Sonnet => "claude-4.5-sonnet",
+            Self::Grok41 => "grok-4.1",
+            Self::Gpt52Thinking => "gpt-5.2-thinking",
+            Self::Claude45SonnetThinking => "claude-4.5-sonnet-thinking",
+            Self::Gemini30Pro => "gemini-3.0-pro",
+            Self::KimiK2Thinking => "kimi-k2-thinking",
+            Self::Grok41Reasoning => "grok-4.1-reasoning",
+        }
+    }
+}
+
+impl fmt::Display for Model {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
 
 /// A file to be uploaded with a search query.
 #[derive(Debug, Clone)]
@@ -47,12 +158,12 @@ impl UploadFile {
 pub struct SearchRequest {
     /// The search query string.
     pub query: String,
-    /// Search mode: "auto", "pro", "reasoning", or "deep research".
-    pub mode: String,
+    /// Search mode: Auto, Pro, Reasoning, or DeepResearch.
+    pub mode: SearchMode,
     /// Optional model to use for the query.
-    pub model: Option<String>,
-    /// Information sources: "web", "scholar", "social".
-    pub sources: Vec<String>,
+    pub model: Option<Model>,
+    /// Information sources: Web, Scholar, Social.
+    pub sources: Vec<Source>,
     /// Files to upload with the query.
     pub files: Vec<UploadFile>,
     /// Language code (ISO 639), e.g., "en-US".
@@ -68,9 +179,9 @@ impl SearchRequest {
     pub fn new(query: impl Into<String>) -> Self {
         Self {
             query: query.into(),
-            mode: "auto".to_string(),
+            mode: SearchMode::Auto,
             model: None,
-            sources: vec!["web".to_string()],
+            sources: vec![Source::Web],
             files: Vec::new(),
             language: "en-US".to_string(),
             follow_up: None,
@@ -79,19 +190,19 @@ impl SearchRequest {
     }
 
     /// Sets the search mode.
-    pub fn mode(mut self, mode: impl Into<String>) -> Self {
-        self.mode = mode.into();
+    pub fn mode(mut self, mode: SearchMode) -> Self {
+        self.mode = mode;
         self
     }
 
     /// Sets the model to use.
-    pub fn model(mut self, model: impl Into<String>) -> Self {
-        self.model = Some(model.into());
+    pub fn model(mut self, model: Model) -> Self {
+        self.model = Some(model);
         self
     }
 
     /// Sets the information sources.
-    pub fn sources(mut self, sources: Vec<String>) -> Self {
+    pub fn sources(mut self, sources: Vec<Source>) -> Self {
         self.sources = sources;
         self
     }

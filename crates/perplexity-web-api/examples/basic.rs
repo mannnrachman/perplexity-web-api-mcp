@@ -2,7 +2,7 @@
 //!
 //! Run with: `cargo run --example basic`
 
-use perplexity_web_api::{Client, SearchRequest};
+use perplexity_web_api::{Client, SearchRequest, Source};
 
 #[tokio::main]
 async fn main() -> perplexity_web_api::Result<()> {
@@ -29,7 +29,7 @@ async fn main() -> perplexity_web_api::Result<()> {
     let response = client
         .search(
             SearchRequest::new("Latest advances in machine learning")
-                .sources(vec!["scholar".to_string()]),
+                .sources(vec![Source::Scholar]),
         )
         .await?;
 

@@ -2,7 +2,7 @@
 //!
 //! Run with: `cargo run --example with_cookies`
 
-use perplexity_web_api::{Client, SearchRequest};
+use perplexity_web_api::{Client, Model, SearchMode, SearchRequest};
 use std::collections::HashMap;
 
 #[tokio::main]
@@ -34,21 +34,21 @@ let client = Client::builder()
 // 3. Use pro mode with specific model
 let response = client.search(
     SearchRequest::new("Explain the implications of quantum supremacy")
-        .mode("pro")
-        .model("gpt-5.2")
+        .mode(SearchMode::Pro)
+        .model(Model::Gpt52)
 ).await?;
 
 // 4. Use reasoning mode for complex analysis
 let response = client.search(
     SearchRequest::new("Compare the economic policies of keynesianism vs monetarism")
-        .mode("reasoning")
-        .model("claude-4.5-sonnet-thinking")
+        .mode(SearchMode::Reasoning)
+        .model(Model::Claude45SonnetThinking)
 ).await?;
 
 // 5. Use deep research for comprehensive topics
 let response = client.search(
     SearchRequest::new("Latest developments in fusion energy research")
-        .mode("deep research")
+        .mode(SearchMode::DeepResearch)
 ).await?;
 "#
         );
@@ -62,8 +62,8 @@ let response = client.search(
     let response = client
         .search(
             SearchRequest::new("Explain the technical challenges of achieving AGI")
-                .mode("pro")
-                .model("gpt-5.2"),
+                .mode(SearchMode::Pro)
+                .model(Model::Gpt52),
         )
         .await?;
 
@@ -79,7 +79,7 @@ let response = client.search(
     let response = client
         .search(
             SearchRequest::new("What are the leading approaches to solving these challenges?")
-                .mode("pro")
+                .mode(SearchMode::Pro)
                 .follow_up(response.follow_up),
         )
         .await?;
