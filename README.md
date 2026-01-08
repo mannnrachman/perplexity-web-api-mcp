@@ -1,10 +1,18 @@
-<h1>Perplexity Web API MCP Server
-    <a href="https://npmjs.com/package/perplexity-web-api-mcp">
-        <img
-            src="https://img.shields.io/npm/v/perplexity-web-api-mcp.svg?color=red"
-            alt="NPM Version" />
+# Perplexity Web API MCP Server
+
+<p>
+<a href="https://npmjs.com/package/perplexity-web-api-mcp">
+    <a href="https://cursor.com/en/install-mcp?name=perplexity-web&config=eyJ0eXBlIjoic3RkaW8iLCJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsInBlcnBsZXhpdHktd2ViLWFwaS1tY3AiXSwiZW52Ijp7IlBFUlBMRVhJVFlfU0VTU0lPTl9UT0tFTiI6IiIsIlBFUlBMRVhJVFlfQ1NSRl9UT0tFTiI6IiJ9fQ==">
+        <img src="https://custom-icon-badges.demolab.com/badge/Install_in_Cursor-000000?style=for-the-badge&logo=cursor-ai-white" alt="Install in Cursor">
     </a>
-</h1>
+    <a href="https://vscode.dev/redirect/mcp/install?name=perplexity-web&config=%7B%22type%22%3A%22stdio%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22perplexity-web-api-mcp%22%5D%2C%22env%22%3A%7B%22PERPLEXITY_SESSION_TOKEN%22%3A%22%22%2C%22PERPLEXITY_CSRF_TOKEN%22%3A%22%22%7D%7D">
+        <img src="https://custom-icon-badges.demolab.com/badge/Install_in_VS_Code-007ACC?style=for-the-badge&logo=vsc&logoColor=white" alt="Install in VS Code">
+    </a>
+    <img
+        src="https://img.shields.io/npm/v/perplexity-web-api-mcp?style=for-the-badge&logo=npm&logoColor=white&color=CB3837"
+        alt="NPM Version" />
+    </a>
+</p>
 
 MCP (Model Context Protocol) server that exposes Perplexity AI search, research, and reasoning capabilities as tools.
 
@@ -25,8 +33,8 @@ MCP (Model Context Protocol) server that exposes Perplexity AI search, research,
 
 This server requires a Perplexity AI account. You need to extract two authentication tokens from your browser cookies:
 
-- `SESSION_TOKEN` - The `next-auth.session-token` cookie value
-- `CSRF_TOKEN` - The `next-auth.csrf-token` cookie value
+- `PERPLEXITY_SESSION_TOKEN` - The `next-auth.session-token` cookie value
+- `PERPLEXITY_CSRF_TOKEN` - The `next-auth.csrf-token` cookie value
 
 #### Getting Your Tokens
 
@@ -34,21 +42,21 @@ This server requires a Perplexity AI account. You need to extract two authentica
 2. Open Developer Tools (F12 or right-click → Inspect)
 3. Go to Application → Cookies → `https://www.perplexity.ai`
 4. Copy the values of:
-   - `next-auth.session-token` → use as `SESSION_TOKEN`
-   - `next-auth.csrf-token` → use as `CSRF_TOKEN`
+   - `next-auth.session-token` → use as `PERPLEXITY_SESSION_TOKEN`
+   - `next-auth.csrf-token` → use as `PERPLEXITY_CSRF_TOKEN`
 
 ## Usage
 
 ### Running the Server
 
 ```bash
-SESSION_TOKEN="your-session-token" CSRF_TOKEN="your-csrf-token" perlexity-web-mcp
+PERPLEXITY_SESSION_TOKEN="your-session-token" PERPLEXITY_CSRF_TOKEN="your-csrf-token" perlexity-web-mcp
 ```
 
 ### Testing with MCP Inspector
 
 ```bash
-SESSION_TOKEN="..." CSRF_TOKEN="..." npx @modelcontextprotocol/inspector cargo run -p perlexity-web-mcp
+PERPLEXITY_SESSION_TOKEN="..." PERPLEXITY_CSRF_TOKEN="..." npx @modelcontextprotocol/inspector cargo run -p perlexity-web-mcp
 ```
 
 ### Claude Desktop Configuration
@@ -61,8 +69,8 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
     "perplexity": {
       "command": "perlexity-web-mcp",
       "env": {
-        "SESSION_TOKEN": "your-session-token",
-        "CSRF_TOKEN": "your-csrf-token"
+        "PERPLEXITY_SESSION_TOKEN": "your-session-token",
+        "PERPLEXITY_CSRF_TOKEN": "your-csrf-token"
       }
     }
   }

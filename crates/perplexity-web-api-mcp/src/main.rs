@@ -1,8 +1,8 @@
 //! MCP server exposing Perplexity AI tools for search, research, and reasoning.
 //!
 //! Requires environment variables:
-//! - `SESSION_TOKEN`: Perplexity session token (maps to `next-auth.session-token` cookie)
-//! - `CSRF_TOKEN`: Perplexity CSRF token (maps to `next-auth.csrf-token` cookie)
+//! - `PERPLEXITY_SESSION_TOKEN`: Perplexity session token (maps to `next-auth.session-token` cookie)
+//! - `PERPLEXITY_CSRF_TOKEN`: Perplexity CSRF token (maps to `next-auth.csrf-token` cookie)
 
 use perplexity_web_api::{Client, SearchRequest};
 use rmcp::{
@@ -183,13 +183,13 @@ fn require_env(name: &str) -> String {
         eprintln!("Error: Required environment variable {} is not set.", name);
         eprintln!();
         eprintln!("Usage:");
-        eprintln!("  SESSION_TOKEN=<token> CSRF_TOKEN=<token> perlexity-web-mcp");
+        eprintln!("  PERPLEXITY_SESSION_TOKEN=<token> PERPLEXITY_CSRF_TOKEN=<token> perlexity-web-mcp");
         eprintln!();
         eprintln!("Required environment variables:");
         eprintln!(
-            "  SESSION_TOKEN  - Perplexity session token (next-auth.session-token cookie)"
+            "  PERPLEXITY_SESSION_TOKEN  - Perplexity session token (next-auth.session-token cookie)"
         );
-        eprintln!("  CSRF_TOKEN     - Perplexity CSRF token (next-auth.csrf-token cookie)");
+        eprintln!("  PERPLEXITY_CSRF_TOKEN     - Perplexity CSRF token (next-auth.csrf-token cookie)");
         std::process::exit(1);
     })
 }
@@ -206,8 +206,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .init();
 
     // Read required environment variables
-    let session_token = require_env("SESSION_TOKEN");
-    let csrf_token = require_env("CSRF_TOKEN");
+    let session_token = require_env("PERPLEXITY_SESSION_TOKEN");
+    let csrf_token = require_env("PERPLEXITY_CSRF_TOKEN");
 
     tracing::info!("Starting Perplexity MCP server");
 
