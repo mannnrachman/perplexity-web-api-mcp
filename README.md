@@ -16,6 +16,14 @@
 
 MCP (Model Context Protocol) server that exposes Perplexity AI search, research, and reasoning capabilities as tools.
 
+## No API Key Required
+
+This MCP server uses your Perplexity account session directly — **no API key needed**.
+
+Perplexity offers a separate [paid API](https://docs.perplexity.ai/guides/pricing) with per-request pricing that is charged independently from your Pro subscription. With this MCP, you don't need to pay for API access — your existing Perplexity subscription (or even a free account) is enough.
+
+Simply extract the session tokens from your browser cookies, and you're ready to use Perplexity search, research, and reasoning in your IDE.
+
 ## Requirements
 
 ### Supported Platforms
