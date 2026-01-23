@@ -1,0 +1,174 @@
+# Contributing Guide
+
+Thank you for your interest in contributing to Perplexity Web API MCP Server! This document provides guidelines and instructions for contributing.
+
+## Requirements
+
+- **Rust 1.90+** (edition 2024)
+- **Cargo** (comes with Rust)
+- A Perplexity AI account (for testing)
+
+## Getting Started
+
+### 1. Fork and Clone
+
+```bash
+git clone https://github.com/YOUR_USERNAME/perplexity-web-api-mcp.git
+cd perplexity-web-api-mcp
+```
+
+### 2. Build the Project
+
+```bash
+cargo build --workspace --all-targets
+```
+
+### 3. Run Tests
+
+```bash
+cargo test --workspace
+```
+
+## Project Structure
+
+```
+perplexity-web-api-mcp/
+├── crates/
+│   ├── perplexity-web-api/       # Core API client library
+│   │   ├── src/
+│   │   │   ├── client.rs         # HTTP client and request handling
+│   │   │   ├── config.rs         # API configuration constants
+│   │   │   ├── error.rs          # Error types
+│   │   │   ├── parse.rs          # Response parsing
+│   │   │   ├── sse.rs            # Server-Sent Events stream handling
+│   │   │   ├── types.rs          # Request/response types
+│   │   │   └── upload.rs         # File upload functionality
+│   │   └── examples/             # Usage examples
+│   └── perplexity-web-api-mcp/   # MCP server binary
+│       └── src/
+│           ├── main.rs           # Entry point
+│           └── server.rs         # MCP tool implementations
+├── Cargo.toml                    # Workspace configuration
+└── AGENTS.md                     # AI agent guidelines
+```
+
+## Development Guidelines
+
+### Workspace Dependencies
+
+- Add new dependencies to the **workspace root** `Cargo.toml` under `[workspace.dependencies]`
+- Reference them in crate `Cargo.toml` files via workspace resolution:
+
+```toml
+[dependencies]
+new-dep = { workspace = true }
+# or with features:
+new-dep = { workspace = true, features = ["feature-name"] }
+```
+
+### Async Rust Best Practices
+
+This project uses **Tokio** for async runtime. Follow these guidelines:
+
+- **Never block the runtime**: avoid `std::thread::sleep`, blocking IO, or heavy CPU work on async tasks
+  - Use `tokio::task::spawn_blocking` if blocking is unavoidable
+- **Propagate cancellation**: respect `.await` cancellation points
+- **Add timeouts**: use `tokio::time::timeout` for external IO operations
+- **Limit concurrency**: prefer bounded channels/streams; avoid unbounded buffering
+- **Minimize cloning**: prefer explicit lifetimes/ownership; use `Arc` intentionally
+- **No panics in library code**: avoid `unwrap()`/`expect()` in runtime paths; return typed errors
+
+### Error Handling
+
+- Use structured errors with `thiserror`
+- Include actionable context in error messages
+- Preserve error sources with `#[source]` for debugging
+- Never leak secrets (API keys, cookies, tokens) in error messages or logs
+
+### Code Style
+
+- Match existing patterns in each module
+- Prefer small, testable functions
+- Document public APIs with doc comments
+- Update examples when API behavior changes
+
+## Before Submitting
+
+### Required Checks
+
+Always run these commands before committing:
+
+```bash
+# Format code
+cargo fmt --all
+
+# Lint with clippy (must pass with no warnings)
+cargo clippy --workspace --all-targets --all-features -- -D warnings
+
+# Build all targets
+cargo build --workspace --all-targets
+```
+
+### Commit Messages
+
+- Use clear, descriptive commit messages
+- Start with a verb in imperative mood: "Add", "Fix", "Update", "Remove"
+- Keep the first line under 72 characters
+- Reference issues when applicable: "Fix #123"
+
+Examples:
+```
+Add timeout configuration to ClientBuilder
+Fix SSE stream parsing for malformed events
+Update error types for better diagnostics
+```
+
+## Pull Request Process
+
+1. **Create a feature branch** from `master`:
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+
+2. **Make your changes** following the guidelines above
+
+3. **Run all checks** to ensure code quality
+
+4. **Push and create a PR** with a clear description:
+   - What changes were made
+   - Why the changes are needed
+   - How to test the changes
+
+5. **Address review feedback** promptly
+
+## Testing
+
+### Running Examples
+
+Examples require authentication tokens. Set environment variables:
+
+```bash
+export PERPLEXITY_SESSION_TOKEN="your-session-token"
+export PERPLEXITY_CSRF_TOKEN="your-csrf-token"
+```
+
+Then run:
+
+```bash
+cargo run --example basic
+cargo run --example streaming
+```
+
+### Adding Tests
+
+- Add unit tests in the same file as the code being tested
+- Add integration tests in `tests/` directory if needed
+- Ensure tests are deterministic and don't require external services
+
+## Questions?
+
+If you have questions or need help, feel free to open an issue for discussion.
+
+## License
+
+By contributing, you agree that your contributions will be licensed under the MIT License.
