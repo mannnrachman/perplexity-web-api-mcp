@@ -4,7 +4,7 @@ resolver = "2"
 
 [workspace.package]
 edition = "2024"
-rust-version = "1.90"
+rust-version = "1.91"
 homepage = "https://github.com/mishamyrt/perplexity-web-api-mcp"
 documentation = "https://github.com/mishamyrt/perplexity-web-api-mcp"
 repository = "https://github.com/mishamyrt/perplexity-web-api-mcp"
@@ -15,7 +15,7 @@ license = "MIT"
 [workspace.dependencies]
 perplexity-web-api = { path = "crates/perplexity-web-api" }
 
-tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
+tokio = { version = "1.49.0", features = ["rt-multi-thread", "macros"] }
 rquest = { version = "5.1.0", features = [
     "cookies",
     "json",
@@ -23,25 +23,25 @@ rquest = { version = "5.1.0", features = [
     "multipart",
 ] }
 rquest-util = "2.2.1"
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
-uuid = { version = "1", features = ["v4"] }
-bytes = "1"
-memchr = "2"
-futures-util = "0.3"
-mime_guess = "2"
-regex = "1"
-thiserror = "2"
-async-stream = "0.3"
-pin-project-lite = "0.2"
-rmcp = { version = "0.12", features = [
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.149"
+uuid = { version = "1.21.0", features = ["v4"] }
+bytes = "1.11.1"
+memchr = "2.8.0"
+futures-util = "0.3.32"
+mime_guess = "2.0.5"
+regex = "1.12.3"
+thiserror = "2.0.18"
+async-stream = "0.3.6"
+pin-project-lite = "0.2.16"
+rmcp = { version = "0.15", features = [
     "server",
     "macros",
     "transport-io",
     "schemars",
 ] }
-tracing = "0.1"
-tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.22", features = ["env-filter"] }
 
 [workspace.lints.rust]
 unreachable_pub = "warn"
