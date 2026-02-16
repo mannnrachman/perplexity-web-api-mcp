@@ -32,7 +32,7 @@ jobs:
         if: runner.os == 'Windows'
         run: echo "CMAKE_GENERATOR=Ninja" >> $env:GITHUB_ENV
       - name: Collect coverage data
-        run: cargo llvm-cov nextest
+        run: cargo llvm-cov nextest ${{ runner.os == 'Windows' && '--release' || '' }}
 
   code-style:
     name: Code style check
