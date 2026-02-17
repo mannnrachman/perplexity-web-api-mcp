@@ -4,7 +4,7 @@ Thank you for your interest in contributing to Perplexity Web API MCP Server! Th
 
 ## Requirements
 
-- **Rust 1.90+** (edition 2024)
+- **Rust 1.91+** (edition 2024)
 - **Cargo** (comes with Rust)
 - A Perplexity AI account (for testing)
 
@@ -19,9 +19,38 @@ cd perplexity-web-api-mcp
 
 ### 2. Build the Project
 
+#### macOS / Linux
+
 ```bash
 cargo build --workspace --all-targets
 ```
+
+#### Windows
+
+Building on Windows requires additional tools because this project depends on BoringSSL (via the `rquest` crate).
+
+**Prerequisites:**
+
+- [Rust](https://rustup.rs)
+- [Visual Studio Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) with the **C++ desktop development** workload
+- CMake, NASM, Ninja, and LLVM (libclang)
+
+**Using the build script:**
+
+The included `build.ps1` script automatically downloads and sets up all required build tools into a local `.build-tools` directory:
+
+```powershell
+# First build (downloads dependencies automatically)
+powershell -ExecutionPolicy Bypass -File build.ps1
+
+# Skip dependency download (if tools are already installed system-wide)
+powershell -ExecutionPolicy Bypass -File build.ps1 -SkipDeps
+
+# Clean build (removes .build-tools and target directories)
+powershell -ExecutionPolicy Bypass -File build.ps1 -Clean
+```
+
+> **Note:** The build must use `--release` mode. Debug builds cause a CRT mismatch between BoringSSL (`/MDd`) and Rust (`/MD`), resulting in linker errors.
 
 ### 3. Run Tests
 

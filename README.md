@@ -30,7 +30,7 @@ Simply extract the session tokens from your browser cookies, and you're ready to
 
 - macOS
 - Linux
-- ~~Windows~~ (not supported yet)
+- Windows (x86_64)
 
 ### Supported Architectures
 
