@@ -139,21 +139,6 @@ jobs:
       - name: Install dependencies
         run: |
           ${{ matrix.packages_install }}
-      - name: Install NASM (Windows)
-        if: runner.os == 'Windows'
-        uses: ilammy/setup-nasm@v1
-      - name: Install Ninja (Windows)
-        if: runner.os == 'Windows'
-        uses: seanmiddleditch/gha-setup-ninja@master
-      - name: Set up LLVM/libclang (Windows)
-        if: runner.os == 'Windows'
-        uses: KyleMayes/install-llvm-action@v2
-        with:
-          version: "18"
-      - name: Set CMake generator to Ninja (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: echo "CMAKE_GENERATOR=Ninja" >> $env:GITHUB_ENV
       - name: Build artifacts
         run: |
           # Actually do builds and make zips and whatnot

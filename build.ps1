@@ -68,7 +68,9 @@ if (-not $SkipDeps) {
         $cmakeUrl = "https://github.com/Kitware/CMake/releases/download/v${cmakeVersion}/cmake-${cmakeVersion}-windows-x86_64.zip"
         Invoke-WebRequest -Uri $cmakeUrl -OutFile $cmakeZip
         Expand-Archive -Path $cmakeZip -DestinationPath $BuildToolsDir -Force
-        Rename-Item (Join-Path $BuildToolsDir "cmake-${cmakeVersion}-windows-x86_64") $CmakeDir -ErrorAction SilentlyContinue
+        $cmakeExtracted = Join-Path $BuildToolsDir "cmake-${cmakeVersion}-windows-x86_64"
+        if (Test-Path $CmakeDir) { Remove-Item -Recurse -Force $CmakeDir }
+        Rename-Item $cmakeExtracted $CmakeDir
         Remove-Item $cmakeZip
         Write-Host "CMake installed." -ForegroundColor Green
     } else {
@@ -83,7 +85,9 @@ if (-not $SkipDeps) {
         $nasmUrl = "https://www.nasm.us/pub/nasm/releasebuilds/${nasmVersion}/win64/nasm-${nasmVersion}-win64.zip"
         Invoke-WebRequest -Uri $nasmUrl -OutFile $nasmZip
         Expand-Archive -Path $nasmZip -DestinationPath $BuildToolsDir -Force
-        Rename-Item (Join-Path $BuildToolsDir "nasm-${nasmVersion}") $NasmDir -ErrorAction SilentlyContinue
+        $nasmExtracted = Join-Path $BuildToolsDir "nasm-${nasmVersion}"
+        if (Test-Path $NasmDir) { Remove-Item -Recurse -Force $NasmDir }
+        Rename-Item $nasmExtracted $NasmDir
         Remove-Item $nasmZip
         Write-Host "NASM installed." -ForegroundColor Green
     } else {
@@ -108,20 +112,23 @@ if (-not $SkipDeps) {
     # --- LLVM/libclang ---
     if (-not (Test-Path (Join-Path $LlvmDir "bin\libclang.dll"))) {
         Write-Host "Downloading LLVM (for libclang)..." -ForegroundColor Cyan
-        $llvmVersion = "20.1.2"
+        $llvmVersion = "18.1.8"
         $llvmExe = Join-Path $BuildToolsDir "llvm-installer.exe"
         $llvmUrl = "https://github.com/llvm/llvm-project/releases/download/llvmorg-${llvmVersion}/LLVM-${llvmVersion}-win64.exe"
         Invoke-WebRequest -Uri $llvmUrl -OutFile $llvmExe
 
-        # Extract using 7-Zip if available, otherwise try silent install
+        # Extract using 7-Zip (required for non-admin extraction)
         $sevenZip = "${env:ProgramFiles}\7-Zip\7z.exe"
         if (Test-Path $sevenZip) {
             Write-Host "Extracting LLVM with 7-Zip..." -ForegroundColor Cyan
             New-Item -ItemType Directory -Force -Path $LlvmDir | Out-Null
             & $sevenZip x $llvmExe -o"$LlvmDir" -y | Out-Null
         } else {
-            Write-Host "7-Zip not found. Attempting silent LLVM install..." -ForegroundColor Yellow
-            Start-Process -FilePath $llvmExe -ArgumentList "/S", "/D=$LlvmDir" -Wait -NoNewWindow
+            Remove-Item $llvmExe -ErrorAction SilentlyContinue
+            Write-Host "ERROR: 7-Zip is required to extract LLVM without admin privileges." -ForegroundColor Red
+            Write-Host "Install 7-Zip from: https://7-zip.org" -ForegroundColor Yellow
+            Write-Host "Expected path: $sevenZip" -ForegroundColor Yellow
+            exit 1
         }
         Remove-Item $llvmExe -ErrorAction SilentlyContinue
         Write-Host "LLVM installed." -ForegroundColor Green
@@ -131,18 +138,21 @@ if (-not $SkipDeps) {
 }
 
 # --- Set environment for the build ---
-$env:PATH = "$(Join-Path $CmakeDir 'bin');$(Join-Path $NasmDir '');$(Join-Path $NinjaDir '');$env:PATH"
 $env:CMAKE_GENERATOR = "Ninja"
-$env:LIBCLANG_PATH = Join-Path $LlvmDir "bin"
 
-Write-Host ""
-Write-Host "Build environment:" -ForegroundColor Cyan
-Write-Host "  CMake:    $(Join-Path $CmakeDir 'bin\cmake.exe')"
-Write-Host "  NASM:     $(Join-Path $NasmDir 'nasm.exe')"
-Write-Host "  Ninja:    $(Join-Path $NinjaDir 'ninja.exe')"
-Write-Host "  LLVM:     $($env:LIBCLANG_PATH)"
-Write-Host "  Generator: $($env:CMAKE_GENERATOR)"
-Write-Host ""
+if (-not $SkipDeps) {
+    $env:PATH = "$(Join-Path $CmakeDir 'bin');$(Join-Path $NasmDir '');$(Join-Path $NinjaDir '');$env:PATH"
+    $env:LIBCLANG_PATH = Join-Path $LlvmDir "bin"
+
+    Write-Host ""
+    Write-Host "Build environment:" -ForegroundColor Cyan
+    Write-Host "  CMake:    $(Join-Path $CmakeDir 'bin\cmake.exe')"
+    Write-Host "  NASM:     $(Join-Path $NasmDir 'nasm.exe')"
+    Write-Host "  Ninja:    $(Join-Path $NinjaDir 'ninja.exe')"
+    Write-Host "  LLVM:     $($env:LIBCLANG_PATH)"
+    Write-Host "  Generator: $($env:CMAKE_GENERATOR)"
+    Write-Host ""
+}
 
 # --- Build in release mode ---
 # Release mode is required to avoid CRT mismatch between BoringSSL (debug /MDd)

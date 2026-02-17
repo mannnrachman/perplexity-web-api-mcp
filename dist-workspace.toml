@@ -17,3 +17,8 @@ install-path = "CARGO_HOME"
 install-updater = false
 # Publish jobs to run in CI
 publish-jobs = ["npm"]
+
+# Windows build dependencies for BoringSSL (via rquest crate)
+[dist.dependencies.chocolatey]
+nasm = '*'
+llvm = '*'
