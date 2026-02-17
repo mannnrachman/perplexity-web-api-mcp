@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.0](https://github.com/mishamyrt/perplexity-web-api-mcp/compare/v0.3.1..v0.4.0) - 2026-02-17
+
+### 🚀 Features
+
+- Add Windows x86 support
+
+### 📚 Documentation
+
+- Update cookie name
+
 ## [0.3.1](https://github.com/mishamyrt/perplexity-web-api-mcp/compare/v0.3.0..v0.3.1) - 2026-01-23
 
 ### 📚 Documentation
